@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 
 #include "../grid/grid.h"
@@ -13,6 +14,8 @@
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
+
+#define GAME_SPEED 500
 
 extern SDL_Window *window;
 extern SDL_Renderer *renderer;

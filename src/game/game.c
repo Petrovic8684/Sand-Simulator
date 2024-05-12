@@ -125,6 +125,8 @@ void restart_game(void)
 
     grid_cleanup();
     initialize_grid();
+
+    srand(time(NULL));
 }
 
 void start_game_and_keep_running(void)
@@ -154,8 +156,6 @@ menu:
         poll_events();
         SDL_RenderPresent(renderer);
     }
-
-    start_time = SDL_GetTicks();
 
 game:
     while (is_window_open == true && should_restart == false)

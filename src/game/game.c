@@ -59,7 +59,7 @@ void handle_input(SDL_Event event)
     }
 }
 
-void handle_click(void)
+void handle_click(bool should_delete)
 {
     if (is_in_menu == true)
         return;
@@ -83,8 +83,22 @@ void handle_click(void)
     Uint8 j = mouse_x / cell_size;
     Uint8 i = mouse_y / cell_size;
 
-    grid->content[i][j] = 1;
-    grid->color[i][j] = color_orange;
+    if (should_delete == false)
+    {
+        if (grid->content[i][j] == 1)
+            return;
+
+        grid->content[i - 1][j] = 1;
+        grid->color[i - 1][j] = color_orange;
+    }
+    else
+    {
+        if (grid->content[i][j] == 0)
+            return;
+
+        grid->content[i + 1][j] = 0;
+        grid->color[i + 1][j] = color_gray;
+    }
 }
 
 void poll_events(void)
@@ -101,9 +115,16 @@ void poll_events(void)
             handle_input(event);
             break;
         case SDL_MOUSEMOTION:
+            if (event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT))
+                handle_click(false);
+            if (event.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
+                handle_click(true);
+            break;
         case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT)
-                handle_click();
+                handle_click(false);
+            if (event.button.button == SDL_BUTTON_RIGHT)
+                handle_click(true);
 
             break;
         }

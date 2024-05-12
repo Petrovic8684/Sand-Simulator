@@ -25,7 +25,7 @@ extern bool should_restart;
 void initialize_sdl(void);
 void create_window_and_renderer(const char *title);
 void handle_input(SDL_Event event);
-void handle_click(void);
+void handle_click(bool should_delete);
 void poll_events(void);
 void render(void);
 void restart_game(void);

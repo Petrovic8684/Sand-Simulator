@@ -13,12 +13,6 @@ struct grid
     SDL_Color color[GRID_DIMENSION][GRID_DIMENSION];
 };
 
-enum grid_style
-{
-    GRID_ON,
-    GRID_OFF
-};
-
 extern struct grid *grid;
 
 void initialize_grid(void);

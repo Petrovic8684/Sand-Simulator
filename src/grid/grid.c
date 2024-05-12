@@ -25,33 +25,21 @@ void render_grid()
     for (Uint8 i = 0; i < GRID_DIMENSION; i++)
         for (Uint8 j = 0; j < GRID_DIMENSION; j++)
         {
-            if (grid_style == GRID_ON)
-            {
-                SDL_SetRenderDrawColor(renderer, color_gray.r, color_gray.g, color_gray.b, 255);
-
-                cell.x = j * cell_size;
-                cell.y = i * cell_size;
-                SDL_RenderDrawRect(renderer, &cell);
-            }
-
             if (grid->content[i][j] == 1)
             {
                 rect.x = j * cell_size;
                 rect.y = i * cell_size;
                 SDL_SetRenderDrawColor(renderer, grid->color[i][j].r, grid->color[i][j].g, grid->color[i][j].b, 255);
                 SDL_RenderFillRect(renderer, &rect);
-
-                if (grid_style == GRID_ON)
-                {
-                    SDL_SetRenderDrawColor(renderer, color_gray.r, color_gray.g, color_gray.b, 255);
-                    SDL_RenderDrawRect(renderer, &rect);
-                }
             }
         }
 }
 
 void move_grain_of_sand(Uint8 i_before, Uint8 j_before, Uint8 i_after, Uint8 j_after)
 {
+    if (j_after < 0 || j_after >= GRID_DIMENSION)
+        return;
+
     grid_snapshot->content[i_before][j_before] = 0;
     grid_snapshot->color[i_before][j_before] = color_gray;
 
@@ -61,8 +49,8 @@ void move_grain_of_sand(Uint8 i_before, Uint8 j_before, Uint8 i_after, Uint8 j_a
 
 void update_grid(void)
 {
-    for (Uint8 i = 0; i < GRID_DIMENSION; i++)
-        for (Uint8 j = 0; j < GRID_DIMENSION; j++)
+    for (Uint32 i = 0; i < GRID_DIMENSION; i++)
+        for (Uint32 j = 0; j < GRID_DIMENSION; j++)
         {
             if (grid->content[i][j] == 1)
             {
@@ -75,7 +63,7 @@ void update_grid(void)
                 else if (grid->content[i + 1][j] == 1 && grid->content[i + 1][j + 1] == 0 && grid->content[i + 1][j - 1] == 1) // Falling to the right
                     move_grain_of_sand(i, j, i + 1, j + 1);
 
-                else if (grid->content[i + 1][j] == 1 && grid->content[i + 1][j - 1] == 0 && grid->content[i + 1][j - 1] == 0)
+                else if (grid->content[i + 1][j] == 1 && grid->content[i + 1][j - 1] == 0 && grid->content[i + 1][j - 1] == 0) // 0.5 probability of falling left, 0.5 of right
                 {
                     if ((double)rand() / RAND_MAX > 0.5)
                         move_grain_of_sand(i, j, i + 1, j + 1);

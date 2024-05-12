@@ -15,16 +15,12 @@
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 
-#define GAME_SPEED 500
-
 extern SDL_Window *window;
 extern SDL_Renderer *renderer;
 
 extern bool is_window_open;
 extern bool is_in_menu;
 extern bool should_restart;
-
-extern enum grid_style grid_style;
 
 void initialize_sdl(void);
 void create_window_and_renderer(const char *title);

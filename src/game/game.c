@@ -7,8 +7,6 @@ bool is_window_open = true;
 bool is_in_menu = true;
 bool should_restart = false;
 
-enum grid_style grid_style = GRID_ON;
-
 void initialize_sdl(void)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -58,12 +56,6 @@ void handle_input(SDL_Event event)
 
         should_restart = true;
         break;
-    case SDLK_g:
-        if (is_in_menu == true)
-            return;
-
-        grid_style = (grid_style + 1) % 2;
-        break;
     }
 }
 
@@ -76,6 +68,15 @@ void handle_click(void)
     int mouse_y;
 
     SDL_GetMouseState(&mouse_x, &mouse_y);
+
+    if (mouse_x >= WINDOW_WIDTH)
+        mouse_x = WINDOW_WIDTH - 1;
+    if (mouse_x < 0)
+        mouse_x = 0;
+    if (mouse_y >= WINDOW_HEIGHT)
+        mouse_y = WINDOW_HEIGHT - 1;
+    if (mouse_y < 0)
+        mouse_y = 0;
 
     Uint8 cell_size = WINDOW_WIDTH / GRID_DIMENSION;
 

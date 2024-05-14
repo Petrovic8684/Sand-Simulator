@@ -12,27 +12,38 @@ void initialize_grid(void)
     memset(grid_snapshot->content, 0, sizeof(Uint8[GRID_DIMENSION][GRID_DIMENSION]));
 }
 
-void render_grid()
+void render_grid(void)
 {
-    Uint8 cell_size = WINDOW_WIDTH / GRID_DIMENSION;
-
-    SDL_Rect cell;
-    cell.w = cell.h = cell_size;
-
     SDL_Rect rect;
-    rect.w = rect.h = cell_size;
+    rect.w = rect.h = CELL_SIZE;
 
     for (Uint8 i = 0; i < GRID_DIMENSION; i++)
         for (Uint8 j = 0; j < GRID_DIMENSION; j++)
         {
             if (grid->content[i][j] == 1)
             {
-                rect.x = j * cell_size;
-                rect.y = i * cell_size;
+                rect.x = j * CELL_SIZE;
+                rect.y = i * CELL_SIZE;
                 SDL_SetRenderDrawColor(renderer, grid->color[i][j].r, grid->color[i][j].g, grid->color[i][j].b, 255);
                 SDL_RenderFillRect(renderer, &rect);
             }
         }
+}
+
+void render_paint_radius(void)
+{
+    SDL_Rect cell;
+    cell.w = cell.h = CELL_SIZE;
+
+    SDL_SetRenderDrawColor(renderer, color_white.r, color_white.g, color_white.b, 255);
+
+    cell.x = current_mouse_cell_j * CELL_SIZE;
+    cell.y = current_mouse_cell_i * CELL_SIZE;
+
+    cell.h = paint_radius * CELL_SIZE;
+    cell.w = paint_radius * CELL_SIZE;
+
+    SDL_RenderDrawRect(renderer, &cell);
 }
 
 void move_grain_of_sand(Uint8 i_before, Uint8 j_before, Uint8 i_after, Uint8 j_after)

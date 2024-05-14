@@ -7,6 +7,10 @@ bool is_window_open = true;
 bool is_in_menu = true;
 bool should_restart = false;
 
+int current_mouse_cell_i;
+int current_mouse_cell_j;
+Uint8 paint_radius = 1;
+
 void initialize_sdl(void)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -32,6 +36,28 @@ void create_window_and_renderer(const char *title)
         fprintf(stderr, "SDL renderer failed to initialize: %s\n", SDL_GetError());
         exit(EXIT_FAILURE);
     }
+}
+
+void get_mouse_position(void)
+{
+    int mouse_x;
+    int mouse_y;
+
+    SDL_GetMouseState(&mouse_x, &mouse_y);
+
+    if (mouse_x >= WINDOW_WIDTH)
+        mouse_x = WINDOW_WIDTH - 1;
+    if (mouse_x < 0)
+        mouse_x = 0;
+    if (mouse_y >= WINDOW_HEIGHT)
+        mouse_y = WINDOW_HEIGHT - 1;
+    if (mouse_y < 0)
+        mouse_y = 0;
+
+    int cell_size = CELL_SIZE;
+
+    current_mouse_cell_j = mouse_x / cell_size;
+    current_mouse_cell_i = mouse_y / cell_size;
 }
 
 void handle_input(SDL_Event event)
@@ -64,40 +90,35 @@ void handle_click(bool should_delete)
     if (is_in_menu == true)
         return;
 
-    int mouse_x;
-    int mouse_y;
-
-    SDL_GetMouseState(&mouse_x, &mouse_y);
-
-    if (mouse_x >= WINDOW_WIDTH)
-        mouse_x = WINDOW_WIDTH - 1;
-    if (mouse_x < 0)
-        mouse_x = 0;
-    if (mouse_y >= WINDOW_HEIGHT)
-        mouse_y = WINDOW_HEIGHT - 1;
-    if (mouse_y < 0)
-        mouse_y = 0;
-
-    Uint8 cell_size = WINDOW_WIDTH / GRID_DIMENSION;
-
-    Uint8 j = mouse_x / cell_size;
-    Uint8 i = mouse_y / cell_size;
-
     if (should_delete == false)
     {
-        if (grid->content[i][j] == 1)
-            return;
+        for (Sint8 i = 0; i < paint_radius; i++)
+            for (Sint8 j = 0; j < paint_radius; j++)
+            {
+                if (grid->content[current_mouse_cell_i + i][current_mouse_cell_j + j] == 1)
+                    continue;
 
-        grid_snapshot->content[i][j] = 1;
-        grid_snapshot->color[i][j] = color_orange;
+                if (current_mouse_cell_i + i >= GRID_DIMENSION || current_mouse_cell_j + j >= GRID_DIMENSION)
+                    continue;
+
+                grid_snapshot->content[current_mouse_cell_i + i][current_mouse_cell_j + j] = 1;
+                grid_snapshot->color[current_mouse_cell_i + i][current_mouse_cell_j + j] = color_orange;
+            }
     }
     else
     {
-        if (grid->content[i][j] == 0)
-            return;
+        for (Sint8 i = 0; i < paint_radius; i++)
+            for (Sint8 j = 0; j < paint_radius; j++)
+            {
+                if (grid->content[current_mouse_cell_i + i][current_mouse_cell_j + j] == 0)
+                    continue;
 
-        grid_snapshot->content[i][j] = 0;
-        grid_snapshot->color[i][j] = color_gray;
+                if (current_mouse_cell_i + i >= GRID_DIMENSION || current_mouse_cell_j + j >= GRID_DIMENSION)
+                    continue;
+
+                grid_snapshot->content[current_mouse_cell_i + i][current_mouse_cell_j + j] = 0;
+                grid_snapshot->color[current_mouse_cell_i + i][current_mouse_cell_j + j] = color_gray;
+            }
     }
 
     memcpy(grid, grid_snapshot, sizeof(struct grid));
@@ -127,6 +148,20 @@ void poll_events(void)
                 handle_click(false);
             if (event.button.button == SDL_BUTTON_RIGHT)
                 handle_click(true);
+            break;
+        case SDL_MOUSEWHEEL:
+            if (paint_radius + event.wheel.y < 1)
+            {
+                paint_radius = 1;
+                return;
+            }
+
+            if (paint_radius + event.wheel.y > MAX_PAINT_RADIUS)
+            {
+                paint_radius = MAX_PAINT_RADIUS;
+                return;
+            }
+            paint_radius += event.wheel.y;
 
             break;
         }
@@ -139,6 +174,7 @@ void render(void)
     SDL_RenderClear(renderer);
 
     render_grid();
+    render_paint_radius();
 
     SDL_RenderPresent(renderer);
 }
@@ -198,6 +234,8 @@ game:
         if (elapsed_time > GAME_SPEED)
         {
             start_time = end_time;
+
+            get_mouse_position();
             update_grid();
         }
     }

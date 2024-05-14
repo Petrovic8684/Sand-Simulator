@@ -16,6 +16,7 @@
 #define WINDOW_HEIGHT 600
 
 #define GAME_SPEED 25
+#define MAX_PAINT_RADIUS 15
 
 extern SDL_Window *window;
 extern SDL_Renderer *renderer;
@@ -24,8 +25,13 @@ extern bool is_window_open;
 extern bool is_in_menu;
 extern bool should_restart;
 
+extern int current_mouse_cell_i;
+extern int current_mouse_cell_j;
+extern Uint8 paint_radius;
+
 void initialize_sdl(void);
 void create_window_and_renderer(const char *title);
+void get_mouse_position(void);
 void handle_input(SDL_Event event);
 void handle_click(bool should_delete);
 void poll_events(void);

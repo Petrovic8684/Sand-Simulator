@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include "../game/game.h"
 
-#define GRID_DIMENSION 200
+#define GRID_DIMENSION 20
 
 struct grid
 {
@@ -14,6 +14,7 @@ struct grid
 };
 
 extern struct grid *grid;
+extern struct grid *grid_snapshot;
 
 void initialize_grid(void);
 void render_grid(void);

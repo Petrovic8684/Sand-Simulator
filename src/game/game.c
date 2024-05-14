@@ -88,17 +88,19 @@ void handle_click(bool should_delete)
         if (grid->content[i][j] == 1)
             return;
 
-        grid->content[i - 1][j] = 1;
-        grid->color[i - 1][j] = color_orange;
+        grid_snapshot->content[i][j] = 1;
+        grid_snapshot->color[i][j] = color_orange;
     }
     else
     {
         if (grid->content[i][j] == 0)
             return;
 
-        grid->content[i + 1][j] = 0;
-        grid->color[i + 1][j] = color_gray;
+        grid_snapshot->content[i][j] = 0;
+        grid_snapshot->color[i][j] = color_gray;
     }
+
+    memcpy(grid, grid_snapshot, sizeof(struct grid));
 }
 
 void poll_events(void)
@@ -179,6 +181,8 @@ menu:
         SDL_RenderPresent(renderer);
     }
 
+    start_time = SDL_GetTicks();
+
 game:
     while (is_window_open == true && should_restart == false)
     {
@@ -188,7 +192,14 @@ game:
         if (is_in_menu == true)
             goto menu;
 
-        update_grid();
+        end_time = SDL_GetTicks();
+        elapsed_time = end_time - start_time;
+
+        if (elapsed_time > GAME_SPEED)
+        {
+            start_time = end_time;
+            update_grid();
+        }
     }
 
     if (should_restart == true)
